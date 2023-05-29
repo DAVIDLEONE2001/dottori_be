@@ -22,13 +22,13 @@ public class DottoriBeApplication implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 
 		Dottore dottore1 = Dottore.builder().nome("Marco").cognome("Guido").codiceDottore("MRCGD").inServizio(true)
-				.codFiscalePazienteAttualmenteInVisita("MRCGD01s04s501h").build();
+				.build();
 		dottoreService.inserisciNuovo(dottore1);
 		Dottore dottore2 = Dottore.builder().nome("Mimmo").cognome("Guido").codiceDottore("MRCGgD")
-				.codFiscalePazienteAttualmenteInVisita("MRCGD01s04s501h").build();
+				.build();
 		dottoreService.inserisciNuovo(dottore2);
 		Dottore dottore3 = Dottore.builder().nome("Pietro").cognome("Guido").codiceDottore("MRCggGD")
-				.codFiscalePazienteAttualmenteInVisita("MRCGD01s04s501h").build();
+				.build();
 		dottoreService.inserisciNuovo(dottore3);
 
 	}

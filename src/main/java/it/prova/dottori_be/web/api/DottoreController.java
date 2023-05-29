@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,6 +29,7 @@ import it.prova.dottori_be.web.exception.DottoreNotFoundException;
 import it.prova.dottori_be.web.exception.IdNotNullForInsertException;
 
 @RestController
+@CrossOrigin("*")
 @RequestMapping("/api/dottore")
 public class DottoreController {
 
@@ -48,6 +50,16 @@ public class DottoreController {
 		if (dottore == null)
 			throw new DottoreNotFoundException("Dottore not found con id: " + id);
 
+		return DottoreDTO.buildDottoreDTOFromModel(dottore);
+	}
+	
+	@GetMapping("get/{codiceDottore}")
+	public DottoreDTO findCodicve(@PathVariable(value = "codiceDottore", required = true) String codiceDottore) {
+		Dottore dottore = dottoreService.findByCodice(codiceDottore);
+		
+		if (dottore == null)
+			throw new DottoreNotFoundException("Dottore not found con id: " + codiceDottore);
+		
 		return DottoreDTO.buildDottoreDTOFromModel(dottore);
 	}
 
@@ -75,7 +87,8 @@ public class DottoreController {
 		Dottore dottoreAggiornato = dottoreService.inserisciNuovo(dottoreInput.buildDottoreModel());
 		return DottoreDTO.buildDottoreDTOFromModel(dottoreService.caricaSingoloDottore(dottoreAggiornato.getId()));
 	}
-
+	
+	@CrossOrigin("*")
 	@PostMapping("/impostaInVisita")
 	public DottoreDTO impostaInVisita(@Valid @RequestBody ImpostaInVisitaDTO input) {
 		// se mi viene inviato un id jpa lo interpreta come update ed a me (producer)
@@ -107,13 +120,25 @@ public class DottoreController {
 		return DottoreDTO.buildDottoreDTOFromModel(dottoreAggornato);
 	}
 
+	@PutMapping("aggiorna/{codiceDottore}")
+	public DottoreDTO updateCodice(@Valid @RequestBody DottoreDTO dottoreInput, @PathVariable(required = true) String codiceDottore) {
+		Dottore dottore = dottoreService.findByCodice(codiceDottore);
+
+		if (dottore == null)
+			throw new DottoreNotFoundException("Dottore not found con codice: " + codiceDottore);
+
+		dottoreInput.setId(dottore.getId());
+		Dottore dottoreAggiornato = dottoreService.aggiorna(dottoreInput.buildDottoreModel());
+		return DottoreDTO.buildDottoreDTOFromModel(dottoreAggiornato);
+	}
+	
 	@PutMapping("/{id}")
 	public DottoreDTO update(@Valid @RequestBody DottoreDTO dottoreInput, @PathVariable(required = true) Long id) {
 		Dottore dottore = dottoreService.caricaSingoloDottore(id);
-
+		
 		if (dottore == null)
-			throw new DottoreNotFoundException("Tavolo not found con id: " + id);
-
+			throw new DottoreNotFoundException("Dottore not found con id: " + id);
+		
 		dottoreInput.setId(id);
 		Dottore dottoreAggiornato = dottoreService.aggiorna(dottoreInput.buildDottoreModel());
 		return DottoreDTO.buildDottoreDTOFromModel(dottoreAggiornato);
@@ -123,6 +148,12 @@ public class DottoreController {
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void delete(@PathVariable(required = true) Long id) {
 		dottoreService.rimuovi(id);
+	}
+	@DeleteMapping("/delete/{codiceDottore}")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void deleteCodice(@PathVariable(required = true) String codiceDottore) {
+		
+		dottoreService.rimuovi(dottoreService.findByCodice(codiceDottore).getId());
 	}
 
 //

@@ -36,9 +36,11 @@ inServizio)*/
 	@Column(name = "codfiscalepazienteattualmenteinvisita")
 	private String codFiscalePazienteAttualmenteInVisita;
 	@Column(name = "invisita")
-	private Boolean inVisita;
+	@Builder.Default
+	private Boolean inVisita=false;
 	@Column(name = "inservizio")
-	private Boolean inServizio;
+	@Builder.Default
+	private Boolean inServizio=false;
 	
 	
 	
